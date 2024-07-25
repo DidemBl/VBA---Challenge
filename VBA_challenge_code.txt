@@ -1,0 +1,217 @@
+
+Sub alphabetical_testing()
+
+'Declare a variable for the Worksheets
+
+    Dim ws As Worksheet
+  
+  'LOOP THROUGH ALL SHEETS
+  
+    For Each ws In Worksheets
+  
+        'Declare a variable to hold ticker as a String, Quarterly Change as a Double, PercentChange as a Double, Total Stock Volume as a Long
+        Dim TickerSymbol As String
+        
+        Dim QuarterlyChange As Double
+        
+        Dim PercentChange As Double
+        
+        Dim TotalStockVolume As Double
+        
+        TotalStockVolume = 0
+        
+        Dim SummaryTableLastRow As Integer
+        
+        Dim GreatestPercentDecrease As Double
+        
+        'Declare a variable to hold the counter
+        
+        Dim i As Integer
+        
+        'Declare a variable to hold the counter for the next loop
+        
+        Dim j As Integer
+        
+        'Declare a variable for the last row of the worksheet and the summary table row
+        
+        Dim LastRow As Long
+        
+        Dim SummaryTableRow As Integer
+        
+        Dim OpeningPriceTotal As Double
+        
+        OpeningPriceTotal = 0
+         
+         
+        Dim ClosingPriceTotal As Double
+        
+        ClosingPriceTotal = 0
+         
+          
+         
+         'Label ticker, quarterly change,percent change and total stock volume columns
+         
+        ws.Cells(1, 11).Value = "Ticker"
+        
+        ws.Cells(1, 12).Value = "Quarterly Change"
+        
+        ws.Cells(1, 13).Value = "Percent Change"
+        
+        ws.Cells(1, 14).Value = "Total Stock Volume"
+    
+     
+     'Label, format and autofit greatest percent increase, greatest percent decrease, ticker and value columns
+     
+        ws.Cells(1, 17).Value = "Ticker"
+        
+        ws.Cells(1, 18).Value = "Value"
+        
+        ws.Cells(2, 16).Value = "Greatest % increase"
+        
+        ws.Cells(2, 18).NumberFormat = "0.00%"
+        
+        ws.Cells(3, 16).Value = "Greatest % decrease"
+        
+        ws.Cells(3, 18).NumberFormat = "0.00%"
+        
+        ws.Cells(4, 16).Value = "Greatest total volume"
+            
+        ws.Cells(4, 18).NumberFormat = "0"
+        
+        ws.Columns("A:R").AutoFit
+            
+         'Determine the last row
+         
+        LastRow = ws.Cells(Rows.Count, 1).End(xlUp).Row
+         
+         'Determine the summary table row
+         
+        SummaryTableRow = 2
+         
+         'Determine the last row of the summary table
+         
+        SummaryTableLastRow = ws.Cells(Rows.Count, 11).End(xlUp).Row
+         
+         'Loop through the values
+         
+        For i = 2 To LastRow
+        
+         'Output the ticker symbol, quarterly change,percent change and total stock volume
+         
+            If ws.Cells(i, 1).Value <> ws.Cells(i + 1, 1).Value Then
+            
+            TickerSymbol = ws.Cells(i, 1).Value
+            
+            OpeningPriceTotal = OpeningPriceTotal + ws.Cells(i, 3).Value
+            
+            ClosingPriceTotal = ClosingPriceTotal + ws.Cells(i, 6).Value
+            
+            QuarterlyChange = OpeningPriceTotal - ClosingPriceTotal
+            
+            PercentChange = (QuarterlyChange / OpeningPriceTotal) * 100
+            
+            TotalStockVolume = TotalStockVolume + ws.Cells(i, 7).Value
+            
+        
+            
+            
+            'Print the ticker symbol, quarterly change, percent change, total stock volume in the summary table
+            
+            ws.Range("K" & SummaryTableRow) = TickerSymbol
+            
+            ws.Range("L" & SummaryTableRow) = QuarterlyChange
+            
+            ws.Range("M" & SummaryTableRow) = PercentChange
+            
+            ws.Range("M" & SummaryTableRow).NumberFormat = "0.00%"
+            
+            ws.Range("N" & SummaryTableRow) = TotalStockVolume
+            
+            
+            'Reset the summary table row
+            
+            SummaryTableRow = SummaryTableRow + 1
+            
+            'Reset all the values in the summary table
+            
+            OpeningPriceTotal = 0
+            
+            ClosingPriceTotal = 0
+            
+            QuarterlyChange = 0
+            
+            PercentChange = 0
+            
+            TotalStockVolume = 0
+            
+            
+            Else
+            
+            OpeningPriceTotal = OpeningPriceTotal + ws.Cells(i, 3).Value
+            
+            ClosingPriceTotal = ClosingPriceTotal + ws.Cells(i, 6).Value
+            
+            QuarterlyChange = OpeningPriceTotal - ClosingPriceTotal
+            
+            PercentChange = (QuarterlyChange / OpeningPriceTotal) * 100
+            
+            TotalStockVolume = TotalStockVolume + ws.Cells(i, 7).Value
+            
+            If ws.Range("L" & SummaryTableRow).Value < 0 Then
+            
+            ws.Range("L" & SummaryTableRow).Interior.ColorIndex = 3
+            
+            ElseIf ws.Range("L" & SummaryTableRow).Value > 0 Then
+            
+            ws.Range("L" & SummaryTableRow).Interior.ColorIndex = 4
+            
+            End If
+            
+            
+            
+            
+            'Output  the ticker value and value for  the greatest % increase, greatest % decrease and the total stock volume
+            
+                For j = 2 To SummaryTableLastRow
+        
+                    
+                    
+            
+                    
+                    If ws.Cells(j, 13).Value >= Range("M" & SummaryTableLastRow).Value Then
+                    
+                    ws.Cells(2, 17).Value = ws.Cells(j, 11).Value
+                    
+                    ws.Cells(2, 18).Value = ws.Cells(j, 13).Value
+                    
+                    
+                    ElseIf ws.Cells(j, 13).Value <= ws.Range("M" & SummaryTableLastRow).Value Then
+                    
+                    ws.Cells(3, 17).Value = ws.Cells(j, 11).Value
+                    
+                    ws.Cells(3, 18).Value = ws.Cells(j, 13).Value
+                    
+                    
+                    End If
+                    
+                    If ws.Cells(j, 14).Value >= ws.Range("N" & SummaryTableLastRow).Value Then
+                    
+                    ws.Cells(4, 17).Value = ws.Cells(j, 11).Value
+                    
+                    ws.Cells(4, 18).Value = ws.Cells(j, 14).Value
+                    
+                    End If
+                    
+                Next j
+         
+         End If
+         
+    Next i
+ 
+    Next ws
+ 
+End Sub
+
+
+
+
